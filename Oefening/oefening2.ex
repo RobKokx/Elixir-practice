@@ -1,7 +1,7 @@
 # oefening2.exs
 
-defmodule Print_the_calcs do
-  def make_calcs(a ,b) do
+defmodule PrintTheCalcs do
+  def make_calcs(a, b) do
     som = a + b
     verschil = a - b
     product = a * b
@@ -20,7 +20,7 @@ defmodule Print_the_calcs do
     IO.puts("Rest van #{a} / #{b} = #{rest}")
   end
 
-  def calc_and_print(a, b) do
+  def calcAndPrint(a, b) do
     {som, verschil, product, quotient, rest} = make_calcs(a, b)
     print(a, b, som, verschil, product, quotient, rest)
   end
@@ -29,14 +29,14 @@ end
 a = 10
 b = 3
 
-Print_the_calcs.calc_and_print(a, b)
+PrintTheCalcs.calcAndPrint(a, b)
 
 a = 20
 b = 6
 
-Print_the_calcs.calc_and_print(a, b)
+PrintTheCalcs.calcAndPrint(a, b)
 
 a = 2
 b = 87
 
-Print_the_calcs.calc_and_print(a, b)
+PrintTheCalcs.calcAndPrint(a, b)

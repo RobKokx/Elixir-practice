@@ -20,18 +20,18 @@ IO.puts(Checker.check_getal(0))
 
 defmodule Check_Age do
   def check_leeftijd(leeftijd) when leeftijd < 18 do
-    IO.puts("U bent minderjarig")
+    "U bent minderjarig"
   end
 
   def check_leeftijd(leeftijd) when leeftijd >= 18 and leeftijd <= 65 do
-    IO.puts("U bent volwassen")
+    "U bent volwassen"
   end
 
   def check_leeftijd(leeftijd) when leeftijd > 65 do
-    IO.puts("U bent senior")
+    "U bent senior"
   end
 end
 
-Check_Age.check_leeftijd(16)
-Check_Age.check_leeftijd(30)
-Check_Age.check_leeftijd(70)
+IO.puts(Check_Age.check_leeftijd(16))
+IO.puts(Check_Age.check_leeftijd(30))
+IO.puts(Check_Age.check_leeftijd(70))
