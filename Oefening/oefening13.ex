@@ -29,7 +29,7 @@ defmodule Klas do
 end
 
 defmodule Auto do
-  defstruct [:merk, :model, :jaar, kilometers: 0]
+  defstruct [:merk, :model, :jaar, :kilometers]
 
   def nieuwe_auto(merk, model, jaar) do
   %Auto{merk: merk, model: model, jaar: jaar}
@@ -53,32 +53,62 @@ end
 defmodule Garage do
   defstruct [:autos]
 
-  def totaal_kms(%Garage{autos}) do
-    Enum.sum(auto.kilometers)
+  def totaal_kms(%Garage{autos: autos}) do
+    autos
+    |> Enum.map(& &1.kilometers)
+    |> Enum.sum()
   end
 
-  def oudste_auto(%Garage{autos}) do
-    Enum.min(autos.jaar)
+  def oudste_auto(%Garage{autos: autos}) do
+    Enum.min_by(autos, & &1.jaar)
+  end
+
+
+  def nieuwste_auto(%Garage{autos: autos}) do
+    Enum.max_by(autos, & &1.jaar)
   end
 
 end
 
 
-defmodule MakeStructs do
+defmodule MakeStruct do
   def make_struct(:student, naam, cijfers) do
     %Student{naam: naam, cijfers: cijfers}
   end
 
-  def make_struct(:auto, merk, model, bouwjaar) do
-    %Auto{merk: merk, model: model, jaar: bouwjaar}
+  def make_struct(:auto, merk, model, bouwjaar, kilometers) do
+    %Auto{merk: merk, model: model, jaar: bouwjaar, kilometers: kilometers}
+  end
+
+  def make_struct(:garage, autos) do
+    %Garage{autos: autos}
   end
 end
 
+autos = [
+  MakeStruct.make_struct(:auto, "Toyota", "Yaris", 2018,245126),
+  MakeStruct.make_struct(:auto, "Volkswagen", "Golf", 2015, 148521),
+  MakeStruct.make_struct(:auto, "Honda", "Civic", 2020, 74563),
+  MakeStruct.make_struct(:auto, "Ford", "Focus", 2012, 312956)
+]
+
+garage = MakeStruct.make_struct(:garage, autos)
+
+totale_kms = Garage.totaal_kms(garage)
+IO.puts("De totale gereden aantal kilometers is:#{totale_kms}")
+
+oudste_auto = Garage.oudste_auto(garage)
+IO.puts("Mijn oudste auto die ik heb is die #{oudste_auto.merk} #{oudste_auto.model} daar.")
+
+nieuwte_auto = Garage.nieuwste_auto(garage)
+IO.puts("Mijn nieuwste auto die ik heb is de #{nieuwte_auto.merk} #{nieuwte_auto.model} hier.\n")
+
+
 # Maak een klas
 studenten = [
-  MakeStructs.make_struct(:student, "Rob",[8, 7, 9, 8]),
-  MakeStructs.make_struct(:student, "Lisa",[6, 5, 7, 6]),
-  MakeStructs.make_struct(:student, "Piet",[4, 5, 3, 4])
+  MakeStruct.make_struct(:student, "Rob",[8, 7, 9, 8]),
+  MakeStruct.make_struct(:student, "Lisa",[6, 5, 7, 6]),
+  MakeStruct.make_struct(:student, "Eva",[4, 5, 3, 4])
 ]
 
 Klas.print_resultaten(studenten)
