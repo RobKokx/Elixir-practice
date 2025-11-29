@@ -39,19 +39,10 @@ defmodule TextProcessor do
     |> remove_short_words(min_word_length)
   end
 
-  def swapPlaces(list, i, j) do
-    elem_i = Enum.at(list, i)
-    elem_j = Enum.at(list, j)
-
-    list
-    |> List.replace_at(i, elem_j)
-    |> List.replace_at(j, elem_i)
-
-  end
-
   def reverse_words(string) do
-    list = String.split(string, " ")
-    swapPlaces(list, 0, length(list) - 1)
+    string
+    |> String.split(" ")
+    |> Enum.reverse()
     |> Enum.join(" ")
   end
 
@@ -66,13 +57,14 @@ defmodule TextProcessor do
   def count_vowels(string) do
     vowel_list = ["a","i","o","u","e"]
     string
+    |> String.downcase()
     |> String.graphemes()
     |> Enum.count(fn x -> x in vowel_list end)
   end
 
   def pig_latin(tekst) do
     [head | tail] = String.graphemes(tekst)
-    pig_latin = Enum.join(tail) <> head <> "ay"
+    result = Enum.join(tail) <> head <> "ay"
   end
 end
 
@@ -110,7 +102,7 @@ IO.puts("Woorden over: #{woorden}")
 
 #test 5: reverse words
 IO.puts("\n=== TEST 5: reverse words ===")
-start_input = "Hello world"
+start_input = "een twee drie vier"
 output = TextProcessor.reverse_words(start_input)
 IO.puts("Voor: #{start_input}")
 IO.puts("Na de wissel: #{output}")
