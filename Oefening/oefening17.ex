@@ -8,13 +8,11 @@ defmodule Speler do
   end
 
   def voeg_score_toe(%Speler{} = speler, punten) do
-    %{speler |
-      score: speler.score + punten,
-      games_gespeeld: speler.games_gespeeld + 1
-    }
+    %{speler | score: speler.score + punten, games_gespeeld: speler.games_gespeeld + 1}
   end
 
   def gemiddelde(%Speler{games_gespeeld: 0}), do: 0.0
+
   def gemiddelde(%Speler{} = speler) do
     speler.score / speler.games_gespeeld
   end
@@ -29,7 +27,9 @@ defmodule Scoreboard do
   # Voeg speler toe (als niet bestaat)
   def voeg_speler_toe(spelers, naam) do
     case vind_speler(spelers, naam) do
-      nil -> spelers ++ [Speler.nieuw(naam)]
+      nil ->
+        spelers ++ [Speler.nieuw(naam)]
+
       _speler ->
         IO.puts("⚠️  Speler #{naam} bestaat al!")
         spelers
@@ -63,7 +63,10 @@ defmodule Scoreboard do
     |> Enum.with_index(1)
     |> Enum.each(fn {speler, positie} ->
       gem = Speler.gemiddelde(speler) |> Float.round(1)
-      IO.puts("#{positie}. #{speler.naam} - #{speler.score} punten (#{speler.games_gespeeld} games, avg: #{gem})")
+
+      IO.puts(
+        "#{positie}. #{speler.naam} - #{speler.score} punten (#{speler.games_gespeeld} games, avg: #{gem})"
+      )
     end)
 
     IO.puts("")
@@ -84,40 +87,77 @@ defmodule Scoreboard do
   # === JOUW OPDRACHTEN ===
 
   # 1. beste_speler/1 - Return speler met hoogste score
-  # def beste_speler(spelers) do
-  #   # Hint: Enum.max_by
-  # end
+  def beste_speler(spelers) do
+    Enum.max_by(spelers, & &1.score)
+  end
 
   # 2. slechtste_speler/1 - Return speler met laagste score
-  # def slechtste_speler(spelers) do
-  #   # Hint: Enum.min_by
-  # end
+  def slechtste_speler(spelers) do
+    Enum.min_by(spelers, & &1.score)
+  end
 
   # 3. gemiddelde_score/1 - Bereken gemiddelde score van alle spelers
-  # def gemiddelde_score(spelers) do
-  #   # Hint: totaal score / aantal spelers
-  # end
+  def gemiddelde_score(spelers) do
+    totale_score =
+      spelers
+      |> Enum.map(& &1.score)
+      |> Enum.sum()
+
+    totale_score / length(spelers)
+  end
 
   # 4. boven_gemiddelde/1 - Return spelers boven het gemiddelde
-  # def boven_gemiddelde(spelers) do
-  #   gem = gemiddelde_score(spelers)
-  #   # Filter spelers waar score > gem
-  # end
+  def boven_gemiddelde(spelers) do
+    gem = gemiddelde_score(spelers)
+    Enum.filter(spelers, &(&1.score > gem))
+  end
 
   # 5. BONUS: reset_scores/1 - Reset scores naar 0, behoud games_gespeeld
-  # def reset_scores(spelers) do
-  #   # Hint: Enum.map en update alleen :score field
-  # end
+  def reset_scores(spelers) do
+    Enum.map(spelers, fn speler -> %{speler | score: 0} end)
+  end
 
   # 6. BONUS: verwijder_speler/2 - Verwijder een speler
-  # def verwijder_speler(spelers, naam) do
-  #   # Hint: Enum.filter
-  # end
+  def verwijder_speler(spelers, naam) do
+    naam = String.downcase(naam)
+    Enum.filter(spelers, fn speler -> String.downcase(speler.naam) != naam end)
+  end
 
   # 7. BONUS: speler_info/2 - Toon gedetailleerde info van 1 speler
-  # def speler_info(spelers, naam) do
-  #   # Vind speler en print uitgebreide info
-  # end
+  def speler_info(spelers, naam) do
+    naam = String.downcase(naam)
+
+    spelers
+    |> Enum.filter(fn speler -> String.downcase(speler.naam) == naam end)
+    |> IO.inspect()
+  end
+
+  def simuleer_toernooi(spelers, aantal_ronden) do
+    IO.puts("\n🎲 === TOERNOOI START (#{aantal_ronden} ronden) ===\n")
+
+    # Voor elke ronde:
+    # - Elke speler krijgt random score tussen 50-300
+    # - Toon tussenstand elke 3 ronden
+
+    Enum.reduce(1..aantal_ronden, spelers, fn ronde, acc_spelers ->
+      IO.puts("Ronde #{ronde}...")
+
+      nieuwe_spelers =
+        acc_spelers
+        |> Enum.map(fn speler ->
+          punten = Enum.random(50..300)
+          Speler.voeg_score_toe(speler, punten)
+        end)
+
+      # Toon tussenstand elke 3 ronden
+      if rem(ronde, 3) == 0 do
+        IO.puts("\n=== TUSSENSTAND NA RONDE #{ronde} ===")
+        toon(nieuwe_spelers)
+      end
+
+      nieuwe_spelers
+    end)
+  end
 end
 
 # === TEST HET SCOREBOARD ===
@@ -134,7 +174,7 @@ spelers =
   |> Scoreboard.voeg_speler_toe("Lisa")
   |> Scoreboard.voeg_speler_toe("Piet")
   |> Scoreboard.voeg_speler_toe("Anna")
-  |> Scoreboard.voeg_speler_toe("Tom")
+  |> Scoreboard.voeg_speler_toe("Eva")
 
 IO.puts("Spelers toegevoegd!")
 
@@ -150,7 +190,7 @@ spelers =
   |> Scoreboard.update_score("Lisa", 200)
   |> Scoreboard.update_score("Piet", 120)
   |> Scoreboard.update_score("Anna", 250)
-  |> Scoreboard.update_score("Tom", 80)
+  |> Scoreboard.update_score("Eva", 80)
   |> Scoreboard.update_score("Rob", 180)
   |> Scoreboard.update_score("Lisa", 190)
   |> Scoreboard.update_score("Piet", 140)
@@ -166,31 +206,35 @@ Scoreboard.top(spelers, 3) |> Scoreboard.toon()
 # === TEST JOUW FUNCTIES ===
 
 # # Test beste speler
-# beste = Scoreboard.beste_speler(spelers)
-# IO.puts("\n🏆 Beste speler: #{beste.naam} met #{beste.score} punten!")
+beste = Scoreboard.beste_speler(spelers)
+IO.puts("\n🏆 Beste speler: #{beste.naam} met #{beste.score} punten!")
 
 # # Test slechtste speler
-# slechtste = Scoreboard.slechtste_speler(spelers)
-# IO.puts("😢 Slechtste speler: #{slechtste.naam} met #{slechtste.score} punten")
+slechtste = Scoreboard.slechtste_speler(spelers)
+IO.puts("😢 Slechtste speler: #{slechtste.naam} met #{slechtste.score} punten")
 
 # # Test gemiddelde
-# gem = Scoreboard.gemiddelde_score(spelers)
-# IO.puts("\n📊 Gemiddelde score: #{Float.round(gem, 1)}")
+gem = Scoreboard.gemiddelde_score(spelers)
+IO.puts("\n📊 Gemiddelde score: #{Float.round(gem, 1)}")
 
 # # Test boven gemiddelde
-# boven_gem = Scoreboard.boven_gemiddelde(spelers)
-# IO.puts("\n=== SPELERS BOVEN GEMIDDELDE ===")
-# Scoreboard.toon(boven_gem)
+boven_gem = Scoreboard.boven_gemiddelde(spelers)
+IO.puts("\n=== SPELERS BOVEN GEMIDDELDE ===")
+Scoreboard.toon(boven_gem)
 
 # # Test reset
-# IO.puts("\n=== NA SCORE RESET ===")
-# spelers_reset = Scoreboard.reset_scores(spelers)
-# Scoreboard.toon(spelers_reset)
+IO.puts("\n=== NA SCORE RESET ===")
+spelers_reset = Scoreboard.reset_scores(spelers)
+Scoreboard.toon(spelers_reset)
 
 # # Test verwijder speler
-# spelers = Scoreboard.verwijder_speler(spelers, "Tom")
-# IO.puts("\n=== NA VERWIJDEREN TOM ===")
-# Scoreboard.toon(spelers)
+spelers = Scoreboard.verwijder_speler(spelers, "lisa")
+IO.puts("\n=== NA VERWIJDEREN LISA ===")
+Scoreboard.toon(spelers)
 
 # # Test speler info
-# Scoreboard.speler_info(spelers, "Rob")
+Scoreboard.speler_info(spelers, "Rob")
+
+spelers = Scoreboard.simuleer_toernooi(spelers, 10)
+IO.puts("\n=== 🏆 EINDSTAND ===")
+Scoreboard.toon(spelers)
