@@ -118,9 +118,15 @@ defmodule TodoList do
   end
 
   # 6. BONUS: edit/3 - Wijzig de titel van een todo
-  # def edit(lijst, id, nieuwe_titel) do
-  #   # Jouw code hier!
-  # end
+  def edit(lijst, id, nieuwe_titel) do
+    Enum.map(lijst, fn todo ->
+      if todo.id == id do
+        %{todo | titel: nieuwe_titel}
+      else
+        todo
+      end
+    end)
+  end
 end
 
 # === TEST JE TODO LIST ===
@@ -193,15 +199,18 @@ resultaten = TodoList.zoek(lijst, "Boodschappen")
 IO.puts("\n=== ZOEK RESULTATEN: 'Boodschap' ===")
 TodoList.toon(resultaten)
 
-# Test clear_voltooid
-# lijst = TodoList.clear_voltooid(lijst)
-# IO.puts("\n=== NA CLEAR VOLTOOID ===")
-# TodoList.toon(lijst)
-
 # test toggle
 IO.puts("=== TAAK TOGGELEN ===")
 IO.puts("voor de verandering:")
 TodoList.toon(lijst)
 lijst = TodoList.toggle(lijst, 2)
 IO.puts("na de verandering:")
+TodoList.toon(lijst)
+
+#test aanpassen titel
+IO.puts("=== NAAM VERANDEREN===")
+IO.puts("Voor de verandering:")
+TodoList.toon(lijst)
+lijst = TodoList.edit(lijst, 2, "Vriendin tevreden houden")
+IO.puts("Na de verandering:")
 TodoList.toon(lijst)
