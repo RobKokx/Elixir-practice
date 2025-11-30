@@ -71,32 +71,26 @@ defmodule TodoList do
   # 1. count_open/1 - Tel hoeveel todos nog open zijn
   def count_open(lijst) do
     lijst
-    |> Enum.filter(& &1.voltooid == false)
+    |> Enum.filter(&(&1.voltooid == false))
     |> Enum.count()
   end
 
   # 2. count_voltooid/1 - Tel hoeveel todos voltooid zijn
-  def count_voltooid(lijst) do
-    lijst
-    |> Enum.filter(& &1)
-  end
-
   def count(:open, lijst) do
-      lijst
-    |> Enum.filter(& &1.voltooid == false)
+    lijst
+    |> Enum.filter(&(&1.voltooid == false))
     |> Enum.count()
   end
 
   def count(:closed, lijst) do
     lijst
-    |> Enum.filter(& &1.voltooid == true)
+    |> Enum.filter(&(&1.voltooid == true))
     |> Enum.count()
   end
 
   def count(lijst) do
     Enum.count(lijst)
   end
-
 
   # 3. clear_voltooid/1 - Verwijder alle voltooide todos
   def clear_voltooid(lijst) do
@@ -105,14 +99,23 @@ defmodule TodoList do
 
   # 4. zoek/2 - Zoek todos die bepaalde tekst bevatten
   # Hint: String.contains?(todo.titel, zoekterm)
-  # def zoek(lijst, zoekterm) do
-  #   # Jouw code hier!
-  # end
+  def zoek(lijst, zoekterm) do
+    zoekterm = String.downcase(zoekterm)
+
+    lijst
+    |> Enum.filter(fn todo -> String.contains?(String.downcase(todo.titel), zoekterm) end)
+  end
 
   # 5. BONUS: toggle/2 - Wissel status van todo (voltooid <-> open)
-  # def toggle(lijst, id) do
-  #   # Jouw code hier!
-  # end
+  def toggle(lijst, id) do
+    Enum.map(lijst, fn todo ->
+      if todo.id == id do
+        %{todo | voltooid: !todo.voltooid}
+      else
+        todo
+      end
+    end)
+  end
 
   # 6. BONUS: edit/3 - Wijzig de titel van een todo
   # def edit(lijst, id, nieuwe_titel) do
@@ -134,6 +137,7 @@ lijst =
   |> TodoList.voeg_toe("Boodschappen doen")
   |> TodoList.voeg_toe("Sporten")
   |> TodoList.voeg_toe("Code reviewen")
+  |> TodoList.voeg_toe("boodschappen opruimen")
 
 TodoList.toon(lijst)
 
@@ -147,12 +151,14 @@ TodoList.toon(lijst)
 
 # Filter op open todos
 IO.puts("=== ALLEEN OPEN TAKEN ===")
+
 lijst
 |> TodoList.alleen_open()
 |> TodoList.toon()
 
 # Filter op voltooide todos
 IO.puts("=== VOLTOOIDE TAKEN ===")
+
 lijst
 |> TodoList.alleen_voltooid()
 |> TodoList.toon()
@@ -180,14 +186,22 @@ only_uncompleted = TodoList.clear_voltooid(lijst)
 IO.puts("De lijst voor af")
 IO.inspect(lijst)
 IO.puts("de lijst na de clearing: ")
-IO.inspect(only_uncompleted)
+TodoList.toon(only_uncompleted)
 
 # Test zoek
-# resultaten = TodoList.zoek(lijst, "en")
-# IO.puts("\n=== ZOEK RESULTATEN: 'en' ===")
-# TodoList.toon(resultaten)
+resultaten = TodoList.zoek(lijst, "Boodschappen")
+IO.puts("\n=== ZOEK RESULTATEN: 'Boodschap' ===")
+TodoList.toon(resultaten)
 
 # Test clear_voltooid
 # lijst = TodoList.clear_voltooid(lijst)
 # IO.puts("\n=== NA CLEAR VOLTOOID ===")
 # TodoList.toon(lijst)
+
+# test toggle
+IO.puts("=== TAAK TOGGELEN ===")
+IO.puts("voor de verandering:")
+TodoList.toon(lijst)
+lijst = TodoList.toggle(lijst, 2)
+IO.puts("na de verandering:")
+TodoList.toon(lijst)
