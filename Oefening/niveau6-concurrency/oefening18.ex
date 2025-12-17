@@ -139,20 +139,20 @@ defmodule ParallelFib do
   def fib(n), do: fib(n - 1) + fib(n - 2)
 
   # OPDRACHT: Bereken fibonacci voor lijst van getallen PARALLEL
-  # def calculate_parallel(lijst) do
-  #   parent = self()
-  #
-  #   # Spawn process voor elk getal
-  #   pids = Enum.map(lijst, fn n ->
-  #     spawn(fn ->
-  #       result = fib(n)
-  #       send(parent, {:result, n, result})
-  #     end)
-  #   end)
-  #
-  #   # Verzamel resultaten
-  #   # ... jouw code hier ...
-  # end
+  def calculate_parallel(lijst) do
+    parent = self()
+
+    # Spawn process voor elk getal
+    pids = Enum.map(lijst, fn n ->
+      spawn(fn ->
+        result = fib(n)
+        send(parent, {:result, n, result})
+      end)
+    end)
+
+    # Verzamel resultaten
+    # ... jouw code hier ...
+  end
 end
 
 # Test (maak de functie eerst af!):
