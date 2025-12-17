@@ -46,7 +46,7 @@ defmodule ProcessCounter do
   end
 
   defp do_countdown(n) do
-    IO.puts("#{n}...")
+    IO.puts("#{n}....")
     Process.sleep(500)
     do_countdown(n - 1)
   end
@@ -64,7 +64,6 @@ ProcessCounter.countdown(3)
 ProcessCounter.countdown(5)
 ProcessCounter.countdown(7)
 Process.sleep(5000)
-
 
 # === EXTRA CHALLENGES ===
 
